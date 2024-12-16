@@ -13,14 +13,12 @@ RUN set -x \
     && apt-get install -y librdmacm1 libibumad3 librdmacm-dev libibverbs1 libibverbs-dev ibverbs-utils ibverbs-providers \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
-    
-WORKDIR /workspace
 
-RUN git clone https://github.com/SWivid/F5-TTS.git \
-    && cd F5-TTS \
-    && git submodule update --init --recursive \
-    && sed -i '7iimport sys\nsys.path.append(os.path.dirname(os.path.abspath(__file__)))' src/third_party/BigVGAN/bigvgan.py \
-    && pip install -e . --no-cache-dir
+# Copy the entire repository into the container
+COPY . /workspace/F5-TTS
+WORKDIR /workspace/F5-TTS
+# Install dependencies for evaluation
+RUN pip install -e .[eval]  --no-cache-dir
 
 ENV SHELL=/bin/bash
 
